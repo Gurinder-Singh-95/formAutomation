@@ -8,21 +8,34 @@ export class FormService {
     const page = await browser.newPage();
 
     try {
-      // Navigate to the form page
-      await page.goto('https://bukabantuan.bukalapak.com/form/175');
+      await page.goto('https://warehouse-theme-metal.myshopify.com/account/register');
 
-      // Fill out the form with dummy data
-      await page.type('#firstName', 'John');
-      await page.type('#lastName', 'Doe');
-      // Add more fields as needed
+      // Wait for the form to be visible on the page
+      await page.waitForSelector('#create_customer');
 
-      // Submit the form
-      await page.click('#submitBtn');
+      // Fill in the form inputs
+      await page.type('input[autocomplete^="given"]', 'john');
+      await page.type('input[autocomplete^="family"]', 'doe');
+      await page.type('input[autocomplete^="email"]', 'demo@username.com');
+      await page.type('input[type=password]', '123456');
 
-      // Wait for form submission (you may need to adjust the selector and timing)
-      await page.waitForNavigation();
+      // Submit the form by clicking the login button
+      await Promise.all([
+          // Wait for navigation to complete
+          page.waitForNavigation(),
+          page.click('.form__submit.button--full'),
+      ]);
 
-      console.log('Form submitted successfully');
+      // Verify registration by checking if the URL contains 'challenge'.
+      // This is a ReCaptcha challenge checking if you're a bot.
+      // We will teach you how to work around it in another tutorial.
+      const signUpUrl = await page.url();
+      if (signUpUrl.includes('challenge')) {
+          console.log('successful!');
+      } else {
+          console.log('failed!');
+      }
+
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {
